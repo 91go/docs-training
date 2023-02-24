@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/gogf/gf/v2/container/garray"
-	"github.com/gogf/gf/v2/os/gfile"
-	"github.com/urfave/cli"
 	"log"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/gogf/gf/v2/container/garray"
+	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/urfave/cli"
 )
 
 var (
@@ -59,7 +60,6 @@ func main() {
 }
 
 func Action(c *cli.Context) error {
-
 	dirs := c.StringSlice("dirs")
 	num := c.Int("num")
 	res := make([]string, 0)
