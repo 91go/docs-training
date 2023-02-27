@@ -7,12 +7,15 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/olekukonko/tablewriter"
+
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/urfave/cli"
 )
 
 var (
+	cmds  []cli.Command
 	flags []cli.Flag
 	n     int
 )
@@ -30,19 +33,27 @@ func init() {
 			Value:       30,
 			Usage:       "num of questions",
 			Destination: &n,
-			Required:    true,
+			Required:    false,
 		},
 		cli.StringSliceFlag{
 			Name:     "w, wf",
 			Value:    &cli.StringSlice{},
 			Usage:    "files",
-			Required: true,
+			Required: false,
 		},
 		cli.StringSliceFlag{
 			Name:     "e, exclude",
 			Value:    &cli.StringSlice{},
 			Usage:    "exclude specified files",
 			Required: false,
+		},
+	}
+	cmds = []cli.Command{
+		{
+			Name:   "count",
+			Usage:  "count the number of questions in each file",
+			Action: Count,
+			Flags:  flags,
 		},
 	}
 }
@@ -54,11 +65,48 @@ func main() {
 	app.HideVersion = true
 	app.Flags = flags
 	app.Action = Action
+	app.Commands = cmds
 
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func Count(c *cli.Context) error {
+	wf := c.StringSlice("wf")
+	ex := c.StringSlice("exclude")
+	res := make([][]string, 0)
+
+	for _, w := range wf {
+		isDir := gfile.IsDir(w)
+		if isDir {
+			files, err := gfile.ScanDir(w, RegMD, true)
+			if err != nil {
+				return cli.NewExitError(err.Error(), 2)
+			}
+			for _, file := range files {
+				isFile := gfile.IsFile(file)
+				if !isFile {
+					return cli.NewExitError("not a file", 2)
+				}
+				fArr := strings.Split(file, "/")
+				if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
+					qs := ExtractQuestion(file)
+					res = append(res, [][]string{{fArr[len(fArr)-1], fmt.Sprintf("%d", len(qs))}}...)
+				}
+			}
+		}
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"File", "Count"})
+	for _, v := range res {
+		table.Append(v)
+	}
+	table.Render()
+
+	return nil
 }
 
 func Action(c *cli.Context) error {
