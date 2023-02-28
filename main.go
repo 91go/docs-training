@@ -39,14 +39,14 @@ func init() {
 			Required: false,
 		},
 	}
-	//cmds = []cli.Command{
-	//	{
-	//		Name:   "count",
-	//		Usage:  "count the number of questions in each file",
-	//		Action: Count,
-	//		Flags:  flags,
-	//	},
-	//}
+	cmds = []cli.Command{
+		{
+			Name:   "count",
+			Usage:  "count the number of questions in each file",
+			Action: Count,
+			Flags:  flags,
+		},
+	}
 }
 
 func main() {
@@ -64,36 +64,26 @@ func main() {
 	}
 }
 
-//func Count(c *cli.Context) error {
-//	wf := c.StringSlice("wf")
-//	ex := c.StringSlice("exclude")
-//	//res := make([][]string, 0)
-//
-//	//for _, w := range wf {
-//	//	isDir := gfile.IsDir(w)
-//	//	if isDir {
-//	//		files, err := gfile.ScanDir(w, RegMD, true)
-//	//		if err != nil {
-//	//			return cli.NewExitError(err.Error(), 2)
-//	//		}
-//	//		for _, file := range files {
-//	//			isFile := gfile.IsFile(file)
-//	//			if !isFile {
-//	//				return cli.NewExitError("not a file", 2)
-//	//			}
-//	//			fArr := strings.Split(file, "/")
-//	//			if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
-//	//				qs := ExtractQuestion(file)
-//	//				res = append(res, [][]string{{w, fArr[len(fArr)-1], fmt.Sprintf("%d", len(qs))}}...)
-//	//			}
-//	//		}
-//	//	}
-//	//}
-//
-//	GenerateMDTable(res)
-//
-//	return nil
-//}
+func Count(c *cli.Context) error {
+	wf := c.StringSlice("wf")
+	ex := c.StringSlice("exclude")
+	res := make([][]string, 0)
+
+	for _, w := range wf {
+		var qs [][]string
+		if gfile.IsDir(w) {
+			qs = dir.NewDir(w).Xz().Exclude(ex).GetTableData()
+		}
+		if gfile.IsFile(w) {
+			qs = dir.NewFile(w).Xz().GetTableData(w, 0)
+		}
+		res = append(res, qs...)
+	}
+
+	dir.GenerateMDTable(res)
+
+	return nil
+}
 
 func Action(c *cli.Context) error {
 	wf := c.StringSlice("wf")

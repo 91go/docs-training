@@ -50,7 +50,7 @@ func GenerateMD(qs []string) (rt string) {
 // GenerateMDTable 生成md表格
 func GenerateMDTable(res [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Dir", "File", "Count"})
+	table.SetHeader([]string{"Dir", "File", "Count", "Total"})
 	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 	table.SetCenterSeparator("|")
 	table.SetAutoMergeCells(true)
