@@ -1,2 +1,5 @@
 /wt
 /coverage.out
+/arch/
+/database/
+/lang/

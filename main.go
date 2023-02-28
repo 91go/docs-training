@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
-	"strings"
 
-	"github.com/olekukonko/tablewriter"
-
+	"github.com/91go/weekly-training/dir"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/urfave/cli"
@@ -18,12 +15,6 @@ var (
 	cmds  []cli.Command
 	flags []cli.Flag
 	n     int
-)
-
-const (
-	RegDetails       = `<details>[\s\S]*?</details>`
-	RegUnorderedList = `(?m)^-\s(.*)`
-	RegMD            = `*.md`
 )
 
 func init() {
@@ -79,32 +70,17 @@ func Count(c *cli.Context) error {
 	res := make([][]string, 0)
 
 	for _, w := range wf {
-		isDir := gfile.IsDir(w)
-		if isDir {
-			files, err := gfile.ScanDir(w, RegMD, true)
-			if err != nil {
-				return cli.NewExitError(err.Error(), 2)
-			}
-			for _, file := range files {
-				isFile := gfile.IsFile(file)
-				if !isFile {
-					return cli.NewExitError("not a file", 2)
-				}
-				fArr := strings.Split(file, "/")
-				if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
-					qs := ExtractQuestion(file)
-					res = append(res, [][]string{{fArr[len(fArr)-1], fmt.Sprintf("%d", len(qs))}}...)
-				}
-			}
+		var qs [][]string
+		if gfile.IsDir(w) {
+			qs = dir.NewDir(w).Xz().Exclude(ex).GetTableData()
 		}
+		if gfile.IsFile(w) {
+			qs = dir.NewFile(w).Xz().GetTableData(w, 0)
+		}
+		res = append(res, qs...)
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"File", "Count"})
-	for _, v := range res {
-		table.Append(v)
-	}
-	table.Render()
+	dir.GenerateMDTable(res)
 
 	return nil
 }
@@ -113,70 +89,30 @@ func Action(c *cli.Context) error {
 	wf := c.StringSlice("wf")
 	ex := c.StringSlice("exclude")
 	num := c.Int("num")
-	res := make([]string, 0)
 
+	var zk []string
 	for _, w := range wf {
-		isDir := gfile.IsDir(w)
-		if isDir {
-			files, err := gfile.ScanDir(w, RegMD, true)
-			if err != nil {
-				return cli.NewExitError(err.Error(), 2)
-			}
-			for _, file := range files {
-				isFile := gfile.IsFile(file)
-				if !isFile {
-					return cli.NewExitError("not a file", 2)
-				}
-				fArr := strings.Split(file, "/")
-				if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
-					qs := ExtractQuestion(file)
-					res = append(res, qs...)
-				}
-			}
-		} else {
-			isFile := gfile.IsFile(w)
-			if !isFile {
-				return cli.NewExitError("not a file", 2)
-			}
-			fArr := strings.Split(w, "/")
-			if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
-				qs := ExtractQuestion(w)
-				res = append(res, qs...)
-			}
+		var qs []string
+		if gfile.IsDir(w) {
+			qs = dir.NewDir(w).Xz().Exclude(ex).GetQuestions()
 		}
+		if gfile.IsFile(w) {
+			qs = dir.NewFile(w).Xz().GetQuestions()
+		}
+		zk = append(zk, qs...)
 	}
 
+	lzk := len(zk)
+	if lzk < num {
+		num = lzk
+		log.Printf("%v, the number of questions is less than %d, so use %d", wf, num, lzk)
+	}
+
+	uzk := garray.NewStrArrayFrom(zk).Unique()
+	fmt.Println("unique questions: ", len(uzk.Slice()))
 	// 随机打乱，再取前n个
-	rands := garray.NewStrArrayFrom(res).Shuffle().Rands(num)
-	rt := GenerateMD(rands)
+	rands := garray.NewStrArrayFrom(zk).Shuffle().SubSlice(0, num)
+	rt := dir.GenerateMD(rands)
 	fmt.Println(rt)
-
 	return nil
-}
-
-// ExtractQuestion 从md中提取问题
-func ExtractQuestion(file string) []string {
-	fb := gfile.GetContents(file)
-	reg := regexp.MustCompile(RegDetails)
-	ff := reg.ReplaceAllString(fb, "")
-
-	reg = regexp.MustCompile(RegUnorderedList)
-	ss := reg.FindAllString(ff, -1)
-
-	// 剔除所有有url以及没有？的
-	for i := 0; i < len(ss); i++ {
-		if strings.Contains(ss[i], "http") || (!strings.Contains(ss[i], "？") && !strings.Contains(ss[i], "?")) {
-			ss = append(ss[:i], ss[i+1:]...)
-			i--
-		}
-	}
-	return ss
-}
-
-// GenerateMD 生成最终的md文档
-func GenerateMD(qs []string) (rt string) {
-	for i := 0; i < len(qs); i++ {
-		rt += "- [ ] " + strings.Replace(qs[i], "- ", "", -1) + "\n\n"
-	}
-	return
 }
