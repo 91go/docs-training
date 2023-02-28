@@ -37,8 +37,8 @@ type Dir struct {
 
 type File struct {
 	Name      string
-	Num       int
 	Questions []string
+	Num       int
 }
 
 func init() {
@@ -160,6 +160,12 @@ func Action(c *cli.Context) error {
 				res = append(res, qs...)
 			}
 		}
+	}
+
+	count := len(res)
+	if count < num {
+		num = count
+		log.Printf("%v, the number of questions is less than %d, so use %d", wf, num, count)
 	}
 
 	// 随机打乱，再取前n个
