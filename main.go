@@ -108,17 +108,18 @@ func Count(c *cli.Context) error {
 				fArr := strings.Split(file, "/")
 				if !garray.NewStrArrayFrom(ex).Contains(fmt.Sprintf("%s/%s", fArr[len(fArr)-2], fArr[len(fArr)-1])) {
 					qs := ExtractQuestion(file)
-					res = append(res, [][]string{{fArr[len(fArr)-1], fmt.Sprintf("%d", len(qs))}}...)
+					res = append(res, [][]string{{w, fArr[len(fArr)-1], fmt.Sprintf("%d", len(qs))}}...)
 				}
 			}
 		}
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"File", "Count"})
-	for _, v := range res {
-		table.Append(v)
-	}
+	table.SetHeader([]string{"Dir", "File", "Count"})
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.SetAutoMergeCells(true)
+	table.AppendBulk(res)
 	table.Render()
 
 	return nil
