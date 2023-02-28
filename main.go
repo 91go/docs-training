@@ -24,7 +24,22 @@ const (
 	RegDetails       = `<details>[\s\S]*?</details>`
 	RegUnorderedList = `(?m)^-\s(.*)`
 	RegMD            = `*.md`
+	MarkDel          = "~~"
+	MarkURL          = "http"
+	MarkQuestionEN   = "?"
+	MarkQuestionCN   = "？"
 )
+
+type Dir struct {
+	Name  string
+	Files []File
+}
+
+type File struct {
+	Name      string
+	Num       int
+	Questions []string
+}
 
 func init() {
 	flags = []cli.Flag{
@@ -165,7 +180,7 @@ func ExtractQuestion(file string) []string {
 
 	// 剔除所有有url以及没有？的
 	for i := 0; i < len(ss); i++ {
-		if strings.Contains(ss[i], "http") || (!strings.Contains(ss[i], "？") && !strings.Contains(ss[i], "?")) {
+		if strings.Contains(ss[i], MarkURL) || strings.Contains(ss[i], MarkDel) || (!strings.Contains(ss[i], MarkQuestionCN) && !strings.Contains(ss[i], MarkQuestionEN)) {
 			ss = append(ss[:i], ss[i+1:]...)
 			i--
 		}
