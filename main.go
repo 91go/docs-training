@@ -108,8 +108,6 @@ func Action(c *cli.Context) error {
 		log.Printf("%v, the number of questions is less than %d, so use %d", wf, num, lzk)
 	}
 
-	uzk := garray.NewStrArrayFrom(zk).Unique()
-	fmt.Println("unique questions: ", len(uzk.Slice()))
 	// 随机打乱，再取前n个
 	rands := garray.NewStrArrayFrom(zk).Shuffle().SubSlice(0, num)
 	rt := dir.GenerateMD(rands)
