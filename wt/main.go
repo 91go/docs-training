@@ -5,6 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/util/gconv"
+
 	"github.com/91go/weekly-training/dir"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/os/gfile"
@@ -46,6 +49,12 @@ func init() {
 			Action: Count,
 			Flags:  flags,
 		},
+		{
+			Name:   "lc",
+			Usage:  "根据codetop Top100的题目，生成leetcode的题目",
+			Action: Leetcode,
+			Flags:  flags,
+		},
 	}
 }
 
@@ -81,6 +90,23 @@ func Count(c *cli.Context) error {
 	}
 
 	dir.GenerateMDTable(res)
+
+	return nil
+}
+
+// Leetcode 生成leetcode的题目
+func Leetcode(c *cli.Context) error {
+	num := c.Int("num")
+	qj, err := gjson.LoadJson(gfile.GetContents("questions.json"))
+	if err != nil {
+		return err
+	}
+	rands := garray.NewArrayFrom(qj.Array()).Shuffle().SubSlice(0, num)
+	rt := ""
+	for _, rand := range rands {
+		rt += gconv.String(rand) + "\n"
+	}
+	fmt.Println(rt)
 
 	return nil
 }
