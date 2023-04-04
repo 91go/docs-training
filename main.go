@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +14,9 @@ import (
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/urfave/cli"
 )
+
+//go:embed questions.json
+var questions string
 
 var (
 	cmds  []cli.Command
@@ -97,7 +101,7 @@ func Count(c *cli.Context) error {
 // Leetcode 生成leetcode的题目
 func Leetcode(c *cli.Context) error {
 	num := c.Int("num")
-	qj, err := gjson.LoadJson(gfile.GetContents("questions.json"))
+	qj, err := gjson.LoadJson(questions)
 	if err != nil {
 		return err
 	}
