@@ -1,4 +1,4 @@
-module github.com/91go/weekly-training
+module github.com/91go/docs-training
 
 go 1.20
 

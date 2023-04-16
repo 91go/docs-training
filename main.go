@@ -9,13 +9,13 @@ import (
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/util/gconv"
 
-	"github.com/91go/weekly-training/dir"
+	"github.com/91go/docs-training/dir"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/urfave/cli"
 )
 
-//go:embed questions.json
+//go:embed lc.json
 var questions string
 
 var (
@@ -48,6 +48,12 @@ func init() {
 	}
 	cmds = []cli.Command{
 		{
+			Name:   "all",
+			Usage:  "all the questions in each file, 生成json文件",
+			Action: All,
+			Flags:  flags,
+		},
+		{
 			Name:   "count",
 			Usage:  "count the number of questions in each file",
 			Action: Count,
@@ -64,7 +70,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Weekly-Training"
+	app.Name = "Docs-Training"
 	app.Usage = "use to collocate with gh-ac, generate weekly training items"
 	app.HideVersion = true
 	app.Flags = flags
@@ -95,6 +101,10 @@ func Count(c *cli.Context) error {
 
 	dir.GenerateMDTable(res)
 
+	return nil
+}
+
+func All(c *cli.Context) error {
 	return nil
 }
 

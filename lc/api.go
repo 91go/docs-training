@@ -44,7 +44,7 @@ func main() {
 	page := 1
 
 	// 创建JSON文件
-	file, err := os.Create("questions.json")
+	file, err := os.Create("lc.json")
 	if err != nil {
 		panic(err)
 	}

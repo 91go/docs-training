@@ -1,7 +1,7 @@
-# weekly-training
+# docs-training
 
 ```shell
 
-go install github.com/91go/weekly-training@latest
+go install github.com/91go/docs-training@latest
 
 ```
