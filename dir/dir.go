@@ -3,7 +3,6 @@ package dir
 import (
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/gogf/gf/v2/text/gregex"
@@ -155,28 +154,5 @@ func (d *Dir) GetTableData() (data [][]string) {
 	for _, file := range d.Files {
 		data = append(data, file.GetTableData(d.Name, d.GetQuestionNum())...)
 	}
-	return
-}
-
-func NewFile(name string) *File {
-	return &File{Name: name}
-}
-
-func (f *File) Xz() *File {
-	f.Questions = ExtractQuestion(f.Name)
-	f.Num = len(f.Questions)
-	return f
-}
-
-func (f *File) GetQuestions() []string {
-	return f.Questions
-}
-
-// GetTableData 组装tablewriter需要的数据
-func (f *File) GetTableData(dirname string, total int) (data [][]string) {
-	if total == 0 {
-		total = f.Num
-	}
-	data = append(data, []string{dirname, f.Name, strconv.Itoa(f.Num), strconv.Itoa(total)})
 	return
 }

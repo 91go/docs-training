@@ -42,9 +42,14 @@ func ExtractQuestion(file string) []string {
 // GenerateMD 生成最终的md文档
 func GenerateMD(qs []string) (rt string) {
 	for i := 0; i < len(qs); i++ {
-		rt += "- [ ] " + strings.Replace(qs[i], "- ", "", -1) + "\n\n"
+		rt += ReplaceUnorderedListWithTask(qs[i])
 	}
 	return
+}
+
+// ReplaceUnorderedListWithTask 将无序列表替换为任务列表
+func ReplaceUnorderedListWithTask(str string) string {
+	return "- [ ] " + strings.Replace(str, "- ", "", -1) + "\n\n"
 }
 
 // GenerateMDTable 生成md表格

@@ -104,7 +104,27 @@ func Count(c *cli.Context) error {
 	return nil
 }
 
+// All 提取markdown文件中的header和无序列表
+// 只提取一级header，如果一级header下没有无序列表，则不提取
 func All(c *cli.Context) error {
+	wf := c.StringSlice("wf")
+	ex := c.StringSlice("exclude")
+
+	files := make([]dir.File, 0)
+	for _, w := range wf {
+		if gfile.IsDir(w) {
+			files = dir.NewDir(w).Xz().Exclude(ex).GetFiles()
+		}
+		if gfile.IsFile(w) {
+			files = append(files, *dir.NewFile(w).Xz())
+		}
+	}
+	// 提取files的Name为header，Questions为无序列表
+	res := ""
+	for _, file := range files {
+		res += file.ConvertToMarkdown()
+	}
+	fmt.Println(res)
 	return nil
 }
 
@@ -130,16 +150,15 @@ func Action(c *cli.Context) error {
 	ex := c.StringSlice("exclude")
 	num := c.Int("num")
 
-	var zk []string
+	zk := make([]string, 0)
 	for _, w := range wf {
-		var qs []string
+		// var qs []string
 		if gfile.IsDir(w) {
-			qs = dir.NewDir(w).Xz().Exclude(ex).GetQuestions()
+			zk = append(zk, dir.NewDir(w).Xz().Exclude(ex).GetQuestions()...)
 		}
 		if gfile.IsFile(w) {
-			qs = dir.NewFile(w).Xz().GetQuestions()
+			zk = append(zk, dir.NewFile(w).Xz().GetQuestions()...)
 		}
-		zk = append(zk, qs...)
 	}
 
 	lzk := len(zk)
