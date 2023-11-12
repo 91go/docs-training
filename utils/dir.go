@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"log"
-	"os"
+	"io/fs"
+	"path/filepath"
 	"strings"
 
 	"github.com/gogf/gf/v2/text/gregex"
@@ -11,6 +11,7 @@ import (
 type Dir struct {
 	Name  string
 	Files []File
+	// SubDirs []*Dir
 }
 
 type File struct {
@@ -24,25 +25,46 @@ func NewDir(name string) *Dir {
 }
 
 func (d *Dir) Xz() *Dir {
-	dir := d.Name
-	dirPath, err := os.ReadDir(dir)
-	if err != nil {
-		log.Printf("read dir %s error: %v", dir, err)
-	}
-	sep := string(os.PathSeparator)
-	for _, fi := range dirPath {
+	// dir := d.Name
+	// dirPath, err := os.ReadDir(dir)
+	// if err != nil {
+	// 	log.Printf("read dir %s error: %v", dir, err)
+	// }
+	// sep := string(os.PathSeparator)
+	// for _, fi := range dirPath {
+	// 	// Determine if there is a folder
+	// 	if fi.IsDir() {
+	// 		// trans sub-dirs to Dir struct
+	// 		// d.SubDirs = append(d.SubDirs, NewDir(dir+sep+fi.Name()).Xz())
+	// 		NewDir(dir + sep + fi.Name()).Xz()
+	// 	}
+
+	//
+	// }
+
+	err := filepath.Walk(d.Name, func(path string, fi fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// Skip directories
+		if fi.IsDir() {
+			return nil
+		}
 		// 过滤指定格式的文件
-		ok := strings.HasSuffix(fi.Name(), MarkMD)
-		if ok {
-			filename := dir + sep + fi.Name()
-			qs := ExtractQuestion(filename)
+		if strings.HasSuffix(fi.Name(), MarkMD) {
+			qs := ExtractQuestion(path)
 			d.Files = append(d.Files, File{
 				Name:      fi.Name(),
 				Questions: qs,
 				Num:       len(qs),
 			})
 		}
+		return nil
+	})
+	if err != nil {
+		return nil
 	}
+
 	return d
 }
 

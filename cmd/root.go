@@ -42,14 +42,14 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	// number of questions
-	rootCmd.Flags().IntP("num", "n", 30, "")
+	rootCmd.PersistentFlags().IntP("num", "n", 30, "number of questions")
 
 	// dirs and files
-	rootCmd.Flags().StringSliceP("dirs", "d", []string{"xxx"}, "")
+	rootCmd.PersistentFlags().StringSliceP("wf", "w", nil, "dirs and files")
 
 	// exclude files
-	rootCmd.Flags().StringSliceP("exclude", "e", []string{"xxx"}, "exclude specified files")
+	rootCmd.PersistentFlags().StringSliceP("exclude", "e", nil, "exclude specified files")
 }

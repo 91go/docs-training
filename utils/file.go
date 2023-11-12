@@ -36,6 +36,9 @@ func (f *File) GetTableData(dirname string, total int) (data [][]string) {
 func (f *File) ConvertToMarkdown() (res string) {
 	az := garray.NewStrArrayFrom(f.Questions)
 	// 随机数
+	if az.Len() == 0 {
+		return
+	}
 	azi := rand.Intn(az.Len())
 	azz, _ := az.Get(azi)
 	_ = az.Set(azi, ReplaceUnorderedListWithTask(azz))

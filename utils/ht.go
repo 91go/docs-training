@@ -6,37 +6,66 @@ import (
 	"strings"
 
 	"github.com/gogf/gf/v2/os/gfile"
+
 	"github.com/olekukonko/tablewriter"
 )
 
 const (
 	RegDetails       = `<details>[\s\S]*?</details>`
 	RegUnorderedList = `(?m)^-\s(.*)`
-	RegMD            = `*.md`
-	MarkMD           = `.md`
-	MarkDel          = "~~"
-	MarkURL          = "http"
-	MarkQuestionEN   = "?"
-	MarkQuestionCN   = "？"
+	// RegHeaders       = `^#{1,6}\s+(.*)`
+	// RegHeaders = `(?m)^\*{1,3}(.+?)\*{1,3}(.*)$`
+	// RegHeaders     = `(?m)(?<=# \*\*|## \*\*|### \*\*\*)[^*]+`
+	RegHeaders     = `(?m)(#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+)`
+	RegMD          = `*.md`
+	MarkMD         = `.md`
+	MarkDel        = "~~"
+	MarkURL        = "http"
+	MarkQuestionEN = "?"
+	MarkQuestionCN = "？"
 )
 
 // ExtractQuestion 从md中提取问题
+// func ExtractQuestion(file string) []string {
+// 	fb := gfile.GetContents(file)
+// 	reg := regexp.MustCompile(RegDetails)
+// 	ff := reg.ReplaceAllString(fb, "")
+//
+// 	reg = regexp.MustCompile(RegUnorderedList)
+// 	ss := reg.FindAllString(ff, -1)
+//
+// 	// 剔除所有有url以及没有？的
+// 	for i := 0; i < len(ss); i++ {
+// 		if strings.Contains(ss[i], MarkURL) || strings.Contains(ss[i], MarkDel) || (!strings.Contains(ss[i], MarkQuestionCN) && !strings.Contains(ss[i], MarkQuestionEN)) {
+// 			ss = append(ss[:i], ss[i+1:]...)
+// 			i--
+// 		}
+// 	}
+// 	return ss
+// }
+
 func ExtractQuestion(file string) []string {
 	fb := gfile.GetContents(file)
-	reg := regexp.MustCompile(RegDetails)
-	ff := reg.ReplaceAllString(fb, "")
+	reg := regexp.MustCompile(RegHeaders)
+	headers := reg.FindAllStringSubmatch(fb, -1)
 
-	reg = regexp.MustCompile(RegUnorderedList)
-	ss := reg.FindAllString(ff, -1)
+	// reg = regexp.MustCompile(RegUnorderedList)
+	// ss := reg.FindAllString(ff, -1)
 
 	// 剔除所有有url以及没有？的
-	for i := 0; i < len(ss); i++ {
-		if strings.Contains(ss[i], MarkURL) || strings.Contains(ss[i], MarkDel) || (!strings.Contains(ss[i], MarkQuestionCN) && !strings.Contains(ss[i], MarkQuestionEN)) {
-			ss = append(ss[:i], ss[i+1:]...)
-			i--
-		}
+	// for i := 0; i < len(ss); i++ {
+	// 	if strings.Contains(ss[i], MarkURL) || strings.Contains(ss[i], MarkDel) || (!strings.Contains(ss[i], MarkQuestionCN) && !strings.Contains(ss[i], MarkQuestionEN)) {
+	// 		ss = append(ss[:i], ss[i+1:]...)
+	// 		i--
+	// 	}
+	// }
+
+	var extractedHeaders []string
+	for _, header := range headers {
+		extractedHeaders = append(extractedHeaders, header[2])
 	}
-	return ss
+
+	return extractedHeaders
 }
 
 // GenerateMD 生成最终的md文档

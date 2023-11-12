@@ -15,14 +15,8 @@ import (
 
 // lcExtractCmd represents the lcExtract command
 var lcExtractCmd = &cobra.Command{
-	Use:   "lcExtract",
+	Use:   "extract",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// 定义URL和初始页码
 		url := "https://codetop.cc/api/questions/?page=%d&search=&ordering=-frequency&rate=0"
@@ -93,7 +87,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	rootCmd.AddCommand(lcExtractCmd)
+	lcCmd.AddCommand(lcExtractCmd)
 
 	// Here you will define your flags and configuration settings.
 
