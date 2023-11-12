@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package utils
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 
@@ -20,8 +21,15 @@ func (f *File) Xz() *File {
 	return f
 }
 
-func (f *File) GetQuestions() []string {
-	return f.Questions
+func (f *File) GetQuestions() (qs []string) {
+	var res []string
+	// flatten Question struct
+	for _, q := range f.Questions {
+		res = append(res, fmt.Sprintf("%s [%s](%s)", q.text, q.text, q.url))
+	}
+
+	qs = append(qs, res...)
+	return
 }
 
 // GetTableData 组装tablewriter需要的数据
@@ -34,7 +42,7 @@ func (f *File) GetTableData(dirname string, total int) (data [][]string) {
 }
 
 func (f *File) ConvertToMarkdown() (res string) {
-	az := garray.NewStrArrayFrom(f.Questions)
+	az := garray.NewStrArrayFrom(f.GetQuestions())
 	// 随机数
 	if az.Len() == 0 {
 		return

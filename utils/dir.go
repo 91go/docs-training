@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -16,8 +17,13 @@ type Dir struct {
 
 type File struct {
 	Name      string
-	Questions []string
+	Questions []Question
 	Num       int
+}
+
+type Question struct {
+	text string
+	url  string
 }
 
 func NewDir(name string) *Dir {
@@ -25,23 +31,6 @@ func NewDir(name string) *Dir {
 }
 
 func (d *Dir) Xz() *Dir {
-	// dir := d.Name
-	// dirPath, err := os.ReadDir(dir)
-	// if err != nil {
-	// 	log.Printf("read dir %s error: %v", dir, err)
-	// }
-	// sep := string(os.PathSeparator)
-	// for _, fi := range dirPath {
-	// 	// Determine if there is a folder
-	// 	if fi.IsDir() {
-	// 		// trans sub-dirs to Dir struct
-	// 		// d.SubDirs = append(d.SubDirs, NewDir(dir+sep+fi.Name()).Xz())
-	// 		NewDir(dir + sep + fi.Name()).Xz()
-	// 	}
-
-	//
-	// }
-
 	err := filepath.Walk(d.Name, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -81,7 +70,7 @@ func (d *Dir) Exclude(names []string) *Dir {
 	return d
 }
 
-func (d *Dir) AddFile(name string, questions []string) {
+func (d *Dir) AddFile(name string, questions []Question) {
 	d.Files = append(d.Files, File{Name: name, Questions: questions, Num: len(questions)})
 }
 
@@ -166,7 +155,14 @@ func (d *Dir) GetQuestionNumByFileRegExs(regs []string) int {
 // GetQuestions 获取所有Questions
 func (d *Dir) GetQuestions() (qs []string) {
 	for _, file := range d.Files {
-		qs = append(qs, file.Questions...)
+		var res []string
+		// flatten Question struct
+		for _, q := range file.Questions {
+			qURL := SanitizeParticularPunc(q.url)
+			res = append(res, fmt.Sprintf("%s [%s](%s)", q.text, q.text, qURL))
+		}
+
+		qs = append(qs, res...)
 	}
 	return
 }

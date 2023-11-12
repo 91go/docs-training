@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,14 +12,9 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "docs-training",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:              "docs-training",
+	Short:            "A brief description of your application",
+	PersistentPreRun: checkEnv,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -52,4 +48,15 @@ func init() {
 
 	// exclude files
 	rootCmd.PersistentFlags().StringSliceP("exclude", "e", nil, "exclude specified files")
+}
+
+func checkEnv(cmd *cobra.Command, args []string) {
+	var EnvVar = "BaseURL"
+	if value := os.Getenv(EnvVar); value == "" {
+		fmt.Printf("环境变量 %s 不存在\n", EnvVar)
+		err := os.Setenv(EnvVar, "https://blog.wrss.top/")
+		if err != nil {
+			os.Exit(1)
+		}
+	}
 }

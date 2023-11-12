@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"github.com/gogf/gf/v2/container/garray"
 	"os"
 	"regexp"
 	"strings"
@@ -44,7 +46,8 @@ const (
 // 	return ss
 // }
 
-func ExtractQuestion(file string) []string {
+// ExtractQuestion 从md中提取问题
+func ExtractQuestion(file string) (extractedHeaders []Question) {
 	fb := gfile.GetContents(file)
 	reg := regexp.MustCompile(RegHeaders)
 	headers := reg.FindAllStringSubmatch(fb, -1)
@@ -60,9 +63,15 @@ func ExtractQuestion(file string) []string {
 	// 	}
 	// }
 
-	var extractedHeaders []string
 	for _, header := range headers {
-		extractedHeaders = append(extractedHeaders, header[2])
+		headerCts := header[2]
+		fs := strings.ReplaceAll(file, ".md", "")
+		// determine whether duplicate
+		fx := garray.NewStrArrayFrom(strings.Split(fs, "/")).Unique().Join("/")
+		extractedHeaders = append(extractedHeaders, Question{
+			text: headerCts,
+			url:  fmt.Sprintf("%s%s#%s", os.Getenv("BaseURL"), fx, headerCts),
+		})
 	}
 
 	return extractedHeaders
@@ -90,4 +99,14 @@ func GenerateMDTable(res [][]string) {
 	table.SetAutoMergeCells(true)
 	table.AppendBulk(res)
 	table.Render()
+}
+
+// SanitizeParticularPunc
+// determine whether same name
+// remove particular punctuations
+func SanitizeParticularPunc(str string) string {
+
+	str = strings.ReplaceAll(str, " ", "-")
+	reg := regexp.MustCompile(`[\"?？“”【】]+`)
+	return reg.ReplaceAllString(str, "")
 }
