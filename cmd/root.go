@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -53,7 +52,6 @@ func init() {
 func checkEnv(cmd *cobra.Command, args []string) {
 	var EnvVar = "BaseURL"
 	if value := os.Getenv(EnvVar); value == "" {
-		fmt.Printf("环境变量 %s 不存在\n", EnvVar)
 		err := os.Setenv(EnvVar, "https://blog.wrss.top/")
 		if err != nil {
 			os.Exit(1)

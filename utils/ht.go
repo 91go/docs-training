@@ -87,7 +87,8 @@ func GenerateMD(qs []string) (rt string) {
 
 // ReplaceUnorderedListWithTask 将无序列表替换为任务列表
 func ReplaceUnorderedListWithTask(str string) string {
-	return "- [ ] " + strings.Replace(str, "- ", "", -1) + "\n\n"
+	// return "- [ ] " + strings.Replace(str, "- ", "", -1) + "\n\n"
+	return "- [ ] " + strings.Replace(str, "- ", "", -1) + "\n"
 }
 
 // GenerateMDTable 生成md表格
