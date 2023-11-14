@@ -50,7 +50,7 @@ func init() {
 }
 
 func checkEnv(cmd *cobra.Command, args []string) {
-	var EnvVar = "BaseURL"
+	EnvVar := "BaseURL"
 	if value := os.Getenv(EnvVar); value == "" {
 		err := os.Setenv(EnvVar, "https://blog.wrss.top/")
 		if err != nil {

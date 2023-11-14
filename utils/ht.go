@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/gogf/gf/v2/container/garray"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/gogf/gf/v2/container/garray"
 
 	"github.com/gogf/gf/v2/os/gfile"
 
@@ -106,8 +107,7 @@ func GenerateMDTable(res [][]string) {
 // determine whether same name
 // remove particular punctuations
 func SanitizeParticularPunc(str string) string {
-
-	str = strings.ReplaceAll(str, " ", "-")
-	reg := regexp.MustCompile(`[\"?？“”【】]+`)
+	str = strings.ReplaceAll(strings.ToLower(str), " ", "-")
+	reg := regexp.MustCompile(`[\"?？“”【】+-]+`)
 	return reg.ReplaceAllString(str, "")
 }
