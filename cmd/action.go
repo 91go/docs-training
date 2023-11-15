@@ -25,9 +25,8 @@ var actionCmd = &cobra.Command{
 
 		zk := make([]string, 0)
 		for _, w := range wf {
-			// var qs []string
 			if gfile.IsDir(w) {
-				zk = append(zk, utils.NewDir(w).Xz().Exclude(ex).GetQuestions()...)
+				zk = append(zk, utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetQuestions()...)
 			}
 			if gfile.IsFile(w) {
 				zk = append(zk, utils.NewFile(w).Xz().GetQuestions()...)

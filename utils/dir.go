@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gogf/gf/v2/container/garray"
+	"github.com/gogf/gf/v2/util/grand"
+
 	"github.com/gogf/gf/v2/text/gregex"
 )
 
@@ -30,7 +33,7 @@ func NewDir(name string) *Dir {
 	return &Dir{Name: name}
 }
 
-func (d *Dir) Xz() *Dir {
+func (d *Dir) Xz(fn func(string) []Question) *Dir {
 	err := filepath.Walk(d.Name, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -41,7 +44,8 @@ func (d *Dir) Xz() *Dir {
 		}
 		// 过滤指定格式的文件
 		if strings.HasSuffix(fi.Name(), MarkMD) {
-			qs := ExtractQuestion(path)
+			// qs := ExtractQuestion(path)
+			qs := fn(path)
 			d.Files = append(d.Files, File{
 				Name:      fi.Name(),
 				Questions: qs,
@@ -167,10 +171,38 @@ func (d *Dir) GetQuestions() (qs []string) {
 	return
 }
 
+func (d *Dir) GetInterviews() (qs []string) {
+	for _, file := range d.Files {
+		var res []string
+		// flatten Question struct
+		for _, q := range file.Questions {
+			res = append(res, q.text)
+		}
+
+		qs = append(qs, res...)
+	}
+	return
+}
+
 // GetTableData 组装tablewriter需要的数据
 func (d *Dir) GetTableData() (data [][]string) {
 	for _, file := range d.Files {
 		data = append(data, file.GetTableData(d.Name, d.GetQuestionNum())...)
+	}
+	return
+}
+
+// InterviewsToMarkdown Convert Dir to Markdown string
+func (d *Dir) InterviewsToMarkdown(count int) (res string) {
+	for _, file := range d.Files {
+		rsk := make([]string, count)
+		qLen := grand.Perm(len(file.Questions))[:count]
+		for i, index := range qLen {
+			rsk[i] = file.Questions[index].text
+		}
+
+		res += fmt.Sprintf("## %s \n\n", file.Name)
+		res += fmt.Sprintf("%s \n\n", garray.NewStrArrayFrom(rsk).Join("\n"))
 	}
 	return
 }

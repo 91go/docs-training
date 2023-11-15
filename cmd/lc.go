@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//go:embed lc.json
 var questions string
 
 // lcCmd represents the lc command

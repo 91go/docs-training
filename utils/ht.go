@@ -19,7 +19,9 @@ const (
 	// RegHeaders       = `^#{1,6}\s+(.*)`
 	// RegHeaders = `(?m)^\*{1,3}(.+?)\*{1,3}(.*)$`
 	// RegHeaders     = `(?m)(?<=# \*\*|## \*\*|### \*\*\*)[^*]+`
-	RegHeaders     = `(?m)(#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+)`
+	RegHeaders = `(?m)(#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+)`
+	// RegHeaders = `(?m)(#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+|\*.*?\*)`
+	// RegHeaders     = `(?m)(#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+|\*[^*]+\*)`
 	RegMD          = `*.md`
 	MarkMD         = `.md`
 	MarkDel        = "~~"
@@ -75,7 +77,22 @@ func ExtractQuestion(file string) (extractedHeaders []Question) {
 		})
 	}
 
-	return extractedHeaders
+	return
+}
+
+func ExtractInterviews(file string) (extractedHeaders []Question) {
+	fb := gfile.GetContents(file)
+	reg := regexp.MustCompile(RegUnorderedList)
+	headers := reg.FindAllString(fb, -1)
+
+	for _, header := range headers {
+		extractedHeaders = append(extractedHeaders, Question{
+			text: header,
+			url:  "",
+		})
+	}
+
+	return
 }
 
 // GenerateMD 生成最终的md文档

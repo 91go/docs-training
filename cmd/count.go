@@ -22,7 +22,7 @@ var countCmd = &cobra.Command{
 		for _, w := range wf {
 			var qs [][]string
 			if gfile.IsDir(w) {
-				qs = utils.NewDir(w).Xz().Exclude(ex).GetTableData()
+				qs = utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetTableData()
 			}
 			if gfile.IsFile(w) {
 				qs = utils.NewFile(w).Xz().GetTableData(w, 0)

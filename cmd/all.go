@@ -25,7 +25,7 @@ var allCmd = &cobra.Command{
 		files := make([]utils.File, 0)
 		for _, w := range wf {
 			if gfile.IsDir(w) {
-				files = utils.NewDir(w).Xz().Exclude(ex).GetFiles()
+				files = utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetFiles()
 			}
 			if gfile.IsFile(w) {
 				files = append(files, *utils.NewFile(w).Xz())
