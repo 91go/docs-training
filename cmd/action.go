@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -8,6 +5,8 @@ import (
 	"log"
 
 	"github.com/91go/docs-training/utils"
+
+	"github.com/91go/docs-training/internal"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/os/gfile"
 
@@ -26,10 +25,10 @@ var actionCmd = &cobra.Command{
 		zk := make([]string, 0)
 		for _, w := range wf {
 			if gfile.IsDir(w) {
-				zk = append(zk, utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetQuestions()...)
+				zk = append(zk, internal.NewDir(w).Xz(internal.ExtractQuestion).Exclude(ex).GetQuestions()...)
 			}
 			if gfile.IsFile(w) {
-				zk = append(zk, utils.NewFile(w).Xz().GetQuestions()...)
+				zk = append(zk, internal.NewFile(w).Xz().GetQuestions()...)
 			}
 		}
 

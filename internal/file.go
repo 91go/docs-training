@@ -1,12 +1,11 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
-package utils
+package internal
 
 import (
 	"fmt"
 	"math/rand"
 	"strconv"
+
+	"github.com/91go/docs-training/utils"
 
 	"github.com/gogf/gf/v2/container/garray"
 )
@@ -25,7 +24,7 @@ func (f *File) GetQuestions() (qs []string) {
 	var res []string
 	// flatten Question struct
 	for _, q := range f.Questions {
-		res = append(res, fmt.Sprintf("%s [%s](%s)", q.text, q.text, q.url))
+		res = append(res, fmt.Sprintf("%s [%s](%s)", q.Text, q.Text, q.URL))
 	}
 
 	qs = append(qs, res...)
@@ -49,7 +48,7 @@ func (f *File) ConvertToMarkdown() (res string) {
 	}
 	azi := rand.Intn(az.Len())
 	azz, _ := az.Get(azi)
-	_ = az.Set(azi, ReplaceUnorderedListWithTask(azz))
+	_ = az.Set(azi, utils.ReplaceUnorderedListWithTask(azz))
 
 	res += "## " + f.Name + "\n\n"
 	res += az.Join("\n") + "\n"

@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/91go/docs-training/utils"
+	"github.com/91go/docs-training/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var batchCmd = &cobra.Command{
 		num, _ := cmd.Flags().GetInt("num")
 		var rs string
 		for _, w := range wf {
-			rs += utils.NewDir(w).Xz(utils.ExtractInterviews).InterviewsToMarkdown(num)
+			rs += internal.NewDir(w).Xz(internal.ExtractInterviews).InterviewsToMarkdown(num)
 		}
 		fmt.Println(rs)
 	},

@@ -1,10 +1,15 @@
-package utils
+package internal
 
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	"github.com/91go/docs-training/utils"
+	"github.com/gogf/gf/v2/os/gfile"
 
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/util/grand"
@@ -25,8 +30,8 @@ type File struct {
 }
 
 type Question struct {
-	text string
-	url  string
+	Text string
+	URL  string
 }
 
 func NewDir(name string) *Dir {
@@ -43,7 +48,7 @@ func (d *Dir) Xz(fn func(string) []Question) *Dir {
 			return nil
 		}
 		// 过滤指定格式的文件
-		if strings.HasSuffix(fi.Name(), MarkMD) {
+		if strings.HasSuffix(fi.Name(), utils.MarkMD) {
 			// qs := ExtractQuestion(path)
 			qs := fn(path)
 			d.Files = append(d.Files, File{
@@ -162,8 +167,7 @@ func (d *Dir) GetQuestions() (qs []string) {
 		var res []string
 		// flatten Question struct
 		for _, q := range file.Questions {
-			qURL := SanitizeParticularPunc(q.url)
-			res = append(res, fmt.Sprintf("%s [%s](%s)", q.text, q.text, qURL))
+			res = append(res, fmt.Sprintf("%s [%s](%s)", q.Text, q.Text, q.URL))
 		}
 
 		qs = append(qs, res...)
@@ -176,7 +180,7 @@ func (d *Dir) GetInterviews() (qs []string) {
 		var res []string
 		// flatten Question struct
 		for _, q := range file.Questions {
-			res = append(res, q.text)
+			res = append(res, q.Text)
 		}
 
 		qs = append(qs, res...)
@@ -198,11 +202,63 @@ func (d *Dir) InterviewsToMarkdown(count int) (res string) {
 		rsk := make([]string, count)
 		qLen := grand.Perm(len(file.Questions))[:count]
 		for i, index := range qLen {
-			rsk[i] = file.Questions[index].text
+			rsk[i] = file.Questions[index].Text
 		}
 
 		res += fmt.Sprintf("## %s \n\n", file.Name)
 		res += fmt.Sprintf("%s \n\n", garray.NewStrArrayFrom(rsk).Join("\n"))
 	}
+	return
+}
+
+const (
+	RegHeaders       = `(?m)(#+ \*|#+ \*\*|#+ \*\*\*|#+ \*\*\*\*)\s*([^*]+)`
+	RegUnorderedList = `(?m)^-\s(.*)`
+)
+
+// ExtractQuestion 从md中提取问题
+func ExtractQuestion(file string) (extractedHeaders []Question) {
+	fb := gfile.GetContents(file)
+	reg := regexp.MustCompile(RegHeaders)
+	headers := reg.FindAllStringSubmatch(fb, -1)
+
+	// reg = regexp.MustCompile(RegUnorderedList)
+	// ss := reg.FindAllString(ff, -1)
+
+	// 剔除所有有url以及没有？的
+	// for i := 0; i < len(ss); i++ {
+	// 	if strings.Contains(ss[i], MarkURL) || strings.Contains(ss[i], MarkDel) || (!strings.Contains(ss[i], MarkQuestionCN) && !strings.Contains(ss[i], MarkQuestionEN)) {
+	// 		ss = append(ss[:i], ss[i+1:]...)
+	// 		i--
+	// 	}
+	// }
+
+	for _, header := range headers {
+		headerCts := header[2]
+		fds := strings.ReplaceAll(file, ".md", "")
+		// determine whether duplicate
+		fx := garray.NewStrArrayFrom(strings.Split(fds, "/")).Unique().Join("/")
+		qURL := fmt.Sprintf("%s%s#%s", os.Getenv("BaseURL"), fx, headerCts)
+		extractedHeaders = append(extractedHeaders, Question{
+			Text: headerCts,
+			URL:  utils.SanitizeParticularPunc(qURL),
+		})
+	}
+
+	return
+}
+
+func ExtractInterviews(file string) (extractedHeaders []Question) {
+	fb := gfile.GetContents(file)
+	reg := regexp.MustCompile(RegUnorderedList)
+	headers := reg.FindAllString(fb, -1)
+
+	for _, header := range headers {
+		extractedHeaders = append(extractedHeaders, Question{
+			Text: header,
+			URL:  "",
+		})
+	}
+
 	return
 }

@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/91go/docs-training/utils"
+	"github.com/91go/docs-training/internal"
 	"github.com/gogf/gf/v2/os/gfile"
 
 	"github.com/spf13/cobra"
@@ -22,13 +22,13 @@ var allCmd = &cobra.Command{
 		wf, _ := cmd.Flags().GetStringSlice("wf")
 		ex, _ := cmd.Flags().GetStringSlice("exclude")
 
-		files := make([]utils.File, 0)
+		files := make([]internal.File, 0)
 		for _, w := range wf {
 			if gfile.IsDir(w) {
-				files = utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetFiles()
+				files = internal.NewDir(w).Xz(internal.ExtractQuestion).Exclude(ex).GetFiles()
 			}
 			if gfile.IsFile(w) {
-				files = append(files, *utils.NewFile(w).Xz())
+				files = append(files, *internal.NewFile(w).Xz())
 			}
 		}
 		// 提取files的Name为header，Questions为无序列表

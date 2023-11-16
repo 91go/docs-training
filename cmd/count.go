@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"github.com/91go/docs-training/internal"
 	"github.com/91go/docs-training/utils"
 	"github.com/gogf/gf/v2/os/gfile"
 
@@ -22,10 +23,10 @@ var countCmd = &cobra.Command{
 		for _, w := range wf {
 			var qs [][]string
 			if gfile.IsDir(w) {
-				qs = utils.NewDir(w).Xz(utils.ExtractQuestion).Exclude(ex).GetTableData()
+				qs = internal.NewDir(w).Xz(internal.ExtractQuestion).Exclude(ex).GetTableData()
 			}
 			if gfile.IsFile(w) {
-				qs = utils.NewFile(w).Xz().GetTableData(w, 0)
+				qs = internal.NewFile(w).Xz().GetTableData(w, 0)
 			}
 			res = append(res, qs...)
 		}
