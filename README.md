@@ -7,7 +7,7 @@ go install github.com/91go/docs-training@latest
 ```
 
 
-Used to extract questions from private docusaurus blog. We can use these questions as interview questions or just as a catch-all to familiarize ourselves with the notes.
+Used to extract questions from private docusaurus blog. We can use these questions as interview questions or just as a breakthrough-point to familiarize ourselves with the notes.
 
 Often we are faced with problems that we have solved before and then are unable to solve them when they arise again. Much of this is due to lack of familiarity with your notes, and this tool will help you become more familiar with your notes. 
 
