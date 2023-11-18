@@ -238,10 +238,10 @@ func ExtractQuestion(file string) (extractedHeaders []Question) {
 		fds := strings.ReplaceAll(file, ".md", "")
 		// determine whether duplicate
 		fx := garray.NewStrArrayFrom(strings.Split(fds, "/")).Unique().Join("/")
-		qURL := fmt.Sprintf("%s%s#%s", os.Getenv("BaseURL"), fx, headerCts)
+		qURL := fmt.Sprintf("%s#%s", fx, headerCts)
 		extractedHeaders = append(extractedHeaders, Question{
 			Text: headerCts,
-			URL:  utils.SanitizeParticularPunc(qURL),
+			URL:  fmt.Sprintf("%s%s", os.Getenv("BaseURL"), utils.SanitizeParticularPunc(qURL)),
 		})
 	}
 
