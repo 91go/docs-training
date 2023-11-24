@@ -72,6 +72,6 @@ func GenerateMDTable(res [][]string) {
 // remove particular punctuations
 func SanitizeParticularPunc(str string) string {
 	s := strings.ReplaceAll(strings.ToLower(str), "-", " ")
-	regStr := regexp.MustCompile(`[?？“”【】+\-\[\]:：（）(),，]`).ReplaceAllString(s, "")
+	regStr := regexp.MustCompile(`[?？“”【】+\-\[\]:：（）(),，'&.]`).ReplaceAllString(s, "")
 	return strings.ReplaceAll(regStr, " ", "-")
 }

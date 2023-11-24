@@ -46,6 +46,21 @@ func TestSanitizeParticularPunc(t *testing.T) {
 			args: args{"xxx-------x-x-x-x"},
 			want: "xxx-------x-x-x-x",
 		},
+		{
+			name: "",
+			args: args{"xxx'''''''''"},
+			want: "xxx",
+		},
+		{
+			name: "",
+			args: args{"xxx&&&"},
+			want: "xxx",
+		},
+		{
+			name: "",
+			args: args{"xxx....."},
+			want: "xxx",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
