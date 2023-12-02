@@ -199,8 +199,13 @@ func (d *Dir) GetTableData() (data [][]string) {
 // InterviewsToMarkdown Convert Dir to Markdown string
 func (d *Dir) InterviewsToMarkdown(count int) (res string) {
 	for _, file := range d.Files {
+		lzk := len(file.Questions)
+		if lzk < count {
+			count = lzk
+		}
 		rsk := make([]string, count)
-		qLen := grand.Perm(len(file.Questions))[:count]
+
+		qLen := grand.Perm(lzk)[:count]
 		for i, index := range qLen {
 			rsk[i] = file.Questions[index].Text
 		}
