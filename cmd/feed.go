@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gorilla/feeds"
 	"gopkg.in/yaml.v3"
@@ -73,6 +74,7 @@ func generateRSS(data []Doc) string {
 	feed.Items = append(feed.Items, &feeds.Item{
 		Title:       "docs",
 		Link:        &feeds.Link{Href: "https://github.com/hxhacking/docs"},
+		Id:          time.Now().String(),
 		Description: res,
 	})
 
