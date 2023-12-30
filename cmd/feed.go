@@ -94,48 +94,14 @@ func generateRSS(data []Doc) string {
 }
 
 func generateHTML(data []Doc) string {
-	// Generate HTML markup using the data
 	questions := ""
-
-	// for _, item := range data {
-	// 	questions += fmt.Sprintf("<h2>%s</h2>", item.Docs)
-	// 	questions += "<ul>"
-	// 	for _, question := range item.Qs {
-	// 		// questions += "<!--<li><input disabled=\"\" type=\"checkbox\">" + question + "</li>-->"
-	// 		questions += fmt.Sprintf("<li>%s</li>", RenderMarkdown())
-	// 	}
-	// 	questions += "</ul>"
-	// }
-	//
-	// return fmt.Sprintf(`
-	// 	<!DOCTYPE html>
-	// 	<html lang="en">
-	// 	  <head>
-	// 	  </head>
-	// 	  <body>
-	// 	        %s
-	// 	  </body>
-	// 	</html>
-	//   `, questions)
-
 	for _, item := range data {
 		questions += fmt.Sprintf("# %s \n\n", item.Docs)
 		for _, question := range item.Qs {
 			questions += fmt.Sprintf("- %s \n", question)
-			// questions += fmt.Sprintf("<li>%s</li>", RenderMarkdown())
 		}
 	}
-
-	// return RenderMarkdown(questions)
 	return Md2HTML(questions)
-}
-
-func RenderMarkdown(source string) string {
-	var buf bytes.Buffer
-	if err := goldmark.Convert(StringToBytes(source), &buf); err != nil {
-		return ""
-	}
-	return buf.String()
 }
 
 func Md2HTML(md string) string {
@@ -168,7 +134,7 @@ func Md2HTML(md string) string {
 			html.WithXHTML(),
 		),
 	)
-	if err := markdown.Convert([]byte(md), &buf); err != nil {
+	if err := markdown.Convert(StringToBytes(md), &buf); err != nil {
 		return ""
 	}
 
@@ -177,8 +143,4 @@ func Md2HTML(md string) string {
 
 func StringToBytes(s string) []byte {
 	return unsafe.Slice(unsafe.StringData(s), len(s))
-}
-
-func BytesToString(b []byte) string {
-	return unsafe.String(&b[0], len(b))
 }
