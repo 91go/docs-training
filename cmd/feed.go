@@ -1,10 +1,17 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"time"
+	"unsafe"
+
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
 
 	"github.com/gorilla/feeds"
 	"gopkg.in/yaml.v3"
@@ -90,24 +97,88 @@ func generateHTML(data []Doc) string {
 	// Generate HTML markup using the data
 	questions := ""
 
+	// for _, item := range data {
+	// 	questions += fmt.Sprintf("<h2>%s</h2>", item.Docs)
+	// 	questions += "<ul>"
+	// 	for _, question := range item.Qs {
+	// 		// questions += "<!--<li><input disabled=\"\" type=\"checkbox\">" + question + "</li>-->"
+	// 		questions += fmt.Sprintf("<li>%s</li>", RenderMarkdown())
+	// 	}
+	// 	questions += "</ul>"
+	// }
+	//
+	// return fmt.Sprintf(`
+	// 	<!DOCTYPE html>
+	// 	<html lang="en">
+	// 	  <head>
+	// 	  </head>
+	// 	  <body>
+	// 	        %s
+	// 	  </body>
+	// 	</html>
+	//   `, questions)
+
 	for _, item := range data {
-		questions += fmt.Sprintf("<h2>%s</h2>", item.Docs)
-		questions += "<ul>"
+		questions += fmt.Sprintf("# %s \n\n", item.Docs)
 		for _, question := range item.Qs {
-			// questions += "<!--<li><input disabled=\"\" type=\"checkbox\">" + question + "</li>-->"
-			questions += fmt.Sprintf("<li>%s</li>", question)
+			questions += fmt.Sprintf("- %s \n", question)
+			// questions += fmt.Sprintf("<li>%s</li>", RenderMarkdown())
 		}
-		questions += "</ul>"
 	}
 
-	return fmt.Sprintf(`
-		<!DOCTYPE html>
-		<html lang="en">
-		  <head>
-		  </head>
-		  <body>
-		        %s
-		  </body>
-		</html>
-	  `, questions)
+	// return RenderMarkdown(questions)
+	return Md2HTML(questions)
+}
+
+func RenderMarkdown(source string) string {
+	var buf bytes.Buffer
+	if err := goldmark.Convert(StringToBytes(source), &buf); err != nil {
+		return ""
+	}
+	return buf.String()
+}
+
+func Md2HTML(md string) string {
+	if md == "" {
+		return ""
+	}
+	var buf bytes.Buffer
+	markdown := goldmark.New(
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithExtensions(
+			extension.GFM,
+			extension.Strikethrough,
+			extension.TaskList,
+			extension.Linkify,
+			extension.Table,
+			extension.DefinitionList,
+			extension.Footnote,
+			extension.Typographer,
+			extension.NewTypographer(
+				extension.WithTypographicSubstitutions(extension.TypographicSubstitutions{
+					extension.LeftSingleQuote:  []byte("&sbquo;"),
+					extension.RightSingleQuote: nil, // nil disables a substitution
+				}),
+			),
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			html.WithXHTML(),
+		),
+	)
+	if err := markdown.Convert([]byte(md), &buf); err != nil {
+		return ""
+	}
+
+	return buf.String()
+}
+
+func StringToBytes(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
+func BytesToString(b []byte) string {
+	return unsafe.String(&b[0], len(b))
 }

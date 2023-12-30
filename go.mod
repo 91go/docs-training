@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/feeds v1.1.2
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/cobra v1.8.0
+	github.com/yuin/goldmark v1.6.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
